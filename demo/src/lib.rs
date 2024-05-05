@@ -30,16 +30,12 @@ async fn fetch(
 ) -> Result<axum::http::Response<axum::body::Body>> {
     console_error_panic_hook::set_once();
 
-    tracing_subscriber::fmt::init();
-
     let conn = connection(&env).await;
 
     #[allow(deprecated)]
     let _ = conn
         .execute("CREATE TABLE IF NOT EXISTS todos(task varchar non null)")
         .await;
-
-    tracing::debug!("starting");
 
     Ok(router(env).call(req).await?)
 }
@@ -63,7 +59,16 @@ async fn get_todos(Extension(env): Extension<Env>) -> impl IntoResponse {
     let conn = connection(&env).await;
 
     #[allow(deprecated)]
-    let results = conn.execute("SELECT * FROM todos").await.unwrap().rows;
+    let results = conn.execute("SELECT * FROM todos").await;
+
+    let results = match results {
+        #[allow(deprecated)]
+        Ok(results) => results.rows,
+        Err(error) => {
+            console_log!(":{:?}", error);
+            return (StatusCode::INTERNAL_SERVER_ERROR, Json(Vec::<Todo>::new()));
+        }
+    };
 
     let mut todos: Vec<Todo> = Vec::new();
 
@@ -90,11 +95,18 @@ async fn create_todo(
 
     #[allow(deprecated)]
     // NOT SAFE!!! - WAS "INSERT into todos values (?1)", params![todo.task.clone()]
-    let _ = conn
-        .execute(format!("INSERT into todos values ({})", todo.task))
+    let resp = conn
+        .execute(format!("INSERT into todos values ('{}')", todo.task))
         .await;
 
-    (StatusCode::CREATED, Json(todo))
+    match resp {
+        #[allow(deprecated)]
+        Ok(_) => (StatusCode::CREATED, Json(todo)),
+        Err(error) => {
+            console_log!(":{:?}", error);
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(todo))
+        }
+    }
 }
 
 // the struct for a todo item
