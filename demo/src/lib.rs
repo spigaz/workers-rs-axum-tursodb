@@ -1,9 +1,8 @@
 use axum::{
-    Extension,
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
-    Json, Router,
+    Extension, Json, Router,
 };
 
 #[allow(deprecated)]
@@ -89,7 +88,8 @@ async fn create_todo(
 
     let conn = connection(&env).await;
 
-    #[allow(deprecated)] // NOT SAFE!!! - WAS "INSERT into todos values (?1)", params![todo.task.clone()]
+    #[allow(deprecated)]
+    // NOT SAFE!!! - WAS "INSERT into todos values (?1)", params![todo.task.clone()]
     let _ = conn
         .execute(format!("INSERT into todos values ({})", todo.task))
         .await;
