@@ -30,11 +30,11 @@ turso db show --url <db-name>
 turso db tokens create <db-name>
 ```
 
-Store the credentials inside a `.env` file:
+Store the credentials inside a `.dev.vars` file next to your wrangler.toml:
 
 ```text
-TURSO_DATABASE_URL
-TURSO_AUTH_TOKEN
+LIBSQL_CLIENT_URL=
+LIBSQL_CLIENT_TOKEN=
 ```
 
 ## Run project
