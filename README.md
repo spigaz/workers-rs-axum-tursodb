@@ -6,7 +6,7 @@ https://github.com/tursodatabase/examples/tree/master/app-todo-axum
 And using / adapter with
 https://github.com/tursodatabase/libsql-client-rs?tab=readme-ov-file#cloudflare-workers
 
-NOT TESTED - JUST COMPILED
+Tested
 
 # Axum Todo List
 

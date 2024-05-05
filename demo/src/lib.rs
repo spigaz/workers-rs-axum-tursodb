@@ -6,7 +6,7 @@ use axum::{
 };
 
 #[allow(deprecated)]
-use libsql_client::Client;
+use libsql_client::{Client, Statement};
 use serde::{Deserialize, Serialize};
 use tower_service::Service;
 use worker::*;
@@ -94,9 +94,11 @@ async fn create_todo(
     let conn = connection(&env).await;
 
     #[allow(deprecated)]
-    // NOT SAFE!!! - WAS "INSERT into todos values (?1)", params![todo.task.clone()]
     let resp = conn
-        .execute(format!("INSERT into todos values ('{}')", todo.task))
+        .execute(Statement::with_args(
+            "INSERT into todos values (?1)",
+            &[todo.task.clone()],
+        ))
         .await;
 
     match resp {
