@@ -40,7 +40,7 @@ LIBSQL_CLIENT_TOKEN=
 ## Run project
 
 ```sh
-cargo run
+npx wrangler dev
 ```
 
 Add a new task:
